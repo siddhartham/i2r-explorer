@@ -1,0 +1,7 @@
+.S3Form {
+  padding: 20px;
+}
+.selectedFile {
+  color: #fff;
+  background-color: #116cd6 !important;
+}

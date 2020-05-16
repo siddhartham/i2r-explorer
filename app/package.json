@@ -1,0 +1,14 @@
+{
+  "name": "i2rexplorer",
+  "version": "1.0.5",
+  "description": "File explorer utility. Manage, copy, upload files between local and ftp servers and cloud storages like s3/box etc.",
+  "author": "Int2Root LLP",
+  "homepage": "https://int2root.com",
+  "main": "./main.prod.js",
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}

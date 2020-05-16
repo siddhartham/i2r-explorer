@@ -1,0 +1,21 @@
+UPLOAD MAS
+xcrun altool --validate-app -f "release/mas/i2rexplorer-mac_store.pkg" -t macos -u "mukherjee.siddhartha@gmail.com" -p "@keychain:Developer-altool"
+xcrun altool --upload-app -f "release/mas/i2rexplorer-mac_store.pkg" -t macos -u "mukherjee.siddhartha@gmail.com" -p "@keychain:Developer-altool"
+
+
+
+NOTARIZE MAC
+xcrun altool --notarize-app \
+             --primary-bundle-id "com.int2root.i2rexplorer" \
+             --username "mukherjee.siddhartha@gmail.com" \
+             --password "@keychain:Developer-altool" \
+             --asc-provider "3FC4SA64G3" \
+             --file "release/i2rexplorer-1.0.1.pkg"
+
+xcrun altool --notarization-info "3fe16e81-85f7-4b80-8edd-3271ae469254" \
+--username "mukherjee.siddhartha@gmail.com" \
+--password "@keychain:Developer-altool"
+
+xcrun stapler staple release/i2rexplorer-1.0.1.pkg
+xcrun stapler validate release/i2rexplorer-1.0.1.pkg
+spctl --assess -vvv --type install release/i2rexplorer-1.0.1.pkg

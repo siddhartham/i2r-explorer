@@ -8,8 +8,8 @@
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./app/main.prod.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow } from 'electron';
-// import log from 'electron-log';
+import { app, BrowserWindow, Tray, nativeImage } from 'electron';
+import log from 'electron-log';
 import path from 'path';
 import MenuBuilder from './main/menu';
 import { registerS3Functions } from './main/s3';
@@ -17,8 +17,12 @@ import { registerLocalFunctions } from './main/local';
 
 app.allowRendererProcessReuse = true;
 
+console.log = log.log;
+log.catchErrors();
+
 let isQuitting = false;
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -32,7 +36,7 @@ const installExtensions = async () => {
 
   return Promise.all(
     extensions.map(name => installer.default(installer[name], forceDownload))
-  ).catch(console.log);
+  ).catch(console.error);
 };
 
 const createWindow = async () => {
@@ -62,7 +66,6 @@ const createWindow = async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
-
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
@@ -88,7 +91,7 @@ const createWindow = async () => {
       if (process.platform === 'darwin') {
         app.hide();
       } else {
-        mainWindow.hide();
+        mainWindow?.hide();
       }
     }
     return false;
@@ -101,6 +104,12 @@ const createWindow = async () => {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  tray = new Tray(nativeImage.createFromDataURL("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB/0lEQVQ4T8WTTU9TQRSGn7mf5bapLW1kQWzR4EcILgx+IMVgIBr3utGFa/+S/8CFLogmoGgjBtkY4kKjFhMQiAsiSG1LP27vvWPmtrRiGqMrZzOTmTnPmXPmfcWruzOS9pCed7DsOQtdb+0L0TkXCiB9j6YfYFkmQmhI2WG2LgbBoSC32cTUNYRuEAJc1yV74xb17a949SraQSYVrBuYTgwpg5ClktmpATbmH2FZFmLxzpTUTJPE2Qt8WsqTOTGMXy2rd4IM8N0G34ol+kwdgaBUdxm5ep3vb5eRvt8FxE+NUvnymeO371HdWkMVoTI39nYoPJ0lEXPCMqrVGscmptldWeoCVHNSY5MUFhcwDYGpaezs1xkdz2En06zm50hGFQD2qzUyuZnegM3XL4g6fWGte+UKQ+cvY/cfpbDw+N8BRQW4mMNKpP83IJ7k4/MnpKJR0MTf90CVkBkbx06kWZmbJe3YeFLiegGnp671buLWch6n3cQf5QrZS1eID4/gVUqhLpzBLOsP7hMbOklp9T1Bs9nSgfrG/nMTfHj5jHjEQiJpNH2Sjo0ZO6L0F/6M7sTYXF/jzOQ0xXdvWoCulG/S2N0O9Y2UCE3Hb9QI3EbHOIHvY0QcIgODbMw/bEn5kJlM87ALQ9P94jwhQk+47m9m6kS1Xag0/qchDKNz/BNYMC3mQgF5TQAAAABJRU5ErkJggg=="));
+  tray.addListener('click', ()=>{
+    mainWindow?.show();
+  })
+  tray.setToolTip(app.getName());
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();

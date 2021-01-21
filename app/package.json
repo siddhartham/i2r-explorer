@@ -1,6 +1,6 @@
 {
   "name": "i2rexplorer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "File explorer utility. Manage, copy, upload files between local and ftp servers and cloud storages like s3/box etc.",
   "author": "Int2Root LLP",
   "homepage": "https://int2root.com",

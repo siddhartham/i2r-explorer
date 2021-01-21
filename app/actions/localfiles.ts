@@ -1,4 +1,5 @@
 import { GetState, Dispatch } from '../reducers/types';
+import DataStore from '../utils/dataStore';
 
 const { ipcRenderer } = require('electron');
 const { app } = require('electron').remote;
@@ -7,43 +8,36 @@ const getDefaultFavouriteFolders = () => {
   return [
     {
       name: 'Home',
-      path: app.getPath('home'),
       icon: 'icon-home',
       clr: 'darkviolet'
     },
     {
       name: 'Desktop',
-      path: app.getPath('desktop'),
       icon: 'icon-monitor',
       clr: 'indigo'
     },
     {
       name: 'Documents',
-      path: app.getPath('documents'),
       icon: 'icon-folder',
       clr: '#00bfff'
     },
     {
       name: 'Downloads',
-      path: app.getPath('downloads'),
       icon: 'icon-download',
       clr: 'green'
     },
     {
       name: 'Music',
-      path: app.getPath('music'),
       icon: 'icon-music',
       clr: '#adad03'
     },
     {
       name: 'Videos',
-      path: app.getPath('videos'),
       icon: 'icon-video',
       clr: 'orange'
     },
     {
       name: 'Pictures',
-      path: app.getPath('pictures'),
       icon: 'icon-picture',
       clr: 'red'
     }
@@ -105,6 +99,7 @@ export const removeLocalFavFolder = (pth:any) => {
         favourites.splice(idx, 1);
       }
     }
+    DataStore.Save('favourites', favourites);
     const payload = {
       favourites: favourites,
       favouritesCount: favourites.length
@@ -113,28 +108,34 @@ export const removeLocalFavFolder = (pth:any) => {
   };
 };
 
-export const addToFavFolders = (folders: any) => {
+export const addToFavFolders = (args: any) => {
   return (dispatch: Dispatch, getState: GetState) => {
+    console.log(args);
     const { favourites } = getState().localfiles;
     const defaultsFolders: any = getDefaultFavouriteFolders();
-    folders.forEach((pth: any) => {
-      let defaultFound = false;
-      for (let idx = 0; idx < defaultsFolders.length; idx += 1) {
-        if (defaultsFolders[idx].path === pth) {
-          favourites.push(defaultsFolders[idx]);
-          defaultFound = true;
-          break;
-        }
+    const pth:any = args.folder;
+    const bkmrk:any = args.bookmark;
+    let defaultFound = false;
+    for (let idx = 0; idx < defaultsFolders.length; idx += 1) {
+      if (defaultsFolders[idx].name.toLowerCase() === pth.split('/').pop().toLowerCase()) {
+        favourites.push({...defaultsFolders[idx], path:pth, bookmark: bkmrk});
+        defaultFound = true;
+        break;
       }
-      if (!defaultFound) {
-        favourites.push({
-          name: pth.split('/').pop(),
-          path: pth,
-          icon: 'icon-folder',
-          clr: '#00bfff'
-        });
-      }
-    });
+    }
+    if (!defaultFound) {
+      const tuples:any = pth.split('/');
+      const t1:any = tuples.pop();
+      const t2:any = tuples.pop();
+      favourites.push({
+        name: `..${t2}/${t1}`,
+        path: pth,
+        bookmark: bkmrk,
+        icon: 'icon-folder',
+        clr: '#00bfff'
+      });
+    }
+    if(bkmrk) DataStore.Save('favourites', favourites); //Do not store if boobakr is not presnet
     const payload = {
       favourites: favourites,
       favouritesCount: favourites.length
@@ -304,7 +305,7 @@ export const selectFileAsync = (pth: string, isShift = false) => {
   };
 };
 
-export const getListAsync = (pt: any = null, name: any = null) => {
+export const getListAsync = (pt: any = null, name: any = null, bkmrk: any = null) => {
   return (dispatch: Dispatch, getState: GetState) => {
     const { pathHistory, currentPath } = getState().localfiles;
 
@@ -322,6 +323,6 @@ export const getListAsync = (pt: any = null, name: any = null) => {
       dispatch(updateLocalFiles(payload));
     }
 
-    ipcRenderer.send('LOCAL_LIST_FILES', { pth: pth });
+    ipcRenderer.send('LOCAL_LIST_FILES', { pth: pth, bookmark: bkmrk });
   };
 };

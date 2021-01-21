@@ -35,7 +35,7 @@ export default class S3Delete {
 
     this.s3.deleteObject(params, (err: any, data: any) => {
       if (err){
-        console.log(err, err.stack);
+        console.error(err);
         win.webContents.send('S3_DELETE_CANCEL', {
           s3Path: this.s3Key,
           error: err.message

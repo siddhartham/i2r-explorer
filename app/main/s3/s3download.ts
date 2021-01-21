@@ -71,7 +71,7 @@ export default class S3Download {
         s3Path: this.s3Key
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       win.webContents.send('S3_DOWNLOAD_CANCEL', {
         filePath: this.localPath,
         s3Path: this.s3Key,

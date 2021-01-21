@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, app } from 'electron';
 
 const fs = require('fs');
 const path = require('path');
@@ -8,8 +8,10 @@ const readdir = util.promisify(fs.readdir);
 
 export default class LocalList {
   pth: string;
-  constructor(pth: string) {
+  bookmark: string;
+  constructor(pth: string, bookmark: string) {
     this.pth = pth;
+    this.bookmark = bookmark;
     if(this.pth) this.listFiles();
   }
 
@@ -18,6 +20,11 @@ export default class LocalList {
 
     let win: any = BrowserWindow.getFocusedWindow();
     if (!win) win = BrowserWindow.getAllWindows()[0];
+
+    let stopAccessingSecurityScopedResource:any = null;
+    if(this.bookmark){
+      stopAccessingSecurityScopedResource = app.startAccessingSecurityScopedResource(this.bookmark);
+    }
 
     try {
       readdir(this.pth)
@@ -44,14 +51,31 @@ export default class LocalList {
             seletedFileTT: 0
           };
           win.webContents.send('LOCAL_FILES_LIST_COMPLETE', payload);
+          if(stopAccessingSecurityScopedResource){
+            stopAccessingSecurityScopedResource();
+            stopAccessingSecurityScopedResource = null;
+          }
           return true;
         })
         .catch((err: any) => {
-          console.log(err);
+          console.error(err);
+          if(stopAccessingSecurityScopedResource){
+            stopAccessingSecurityScopedResource();
+            stopAccessingSecurityScopedResource = null;
+          }
           return false;
-        });
+        })
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      if(stopAccessingSecurityScopedResource){
+        stopAccessingSecurityScopedResource();
+        stopAccessingSecurityScopedResource = null;
+      }
+    } finally {
+      if(stopAccessingSecurityScopedResource){
+        stopAccessingSecurityScopedResource();
+        stopAccessingSecurityScopedResource = null;
+      }
     }
   };
 }

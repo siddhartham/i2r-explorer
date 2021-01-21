@@ -16,7 +16,7 @@ export default class LocalDelete {
     try {
       shell.moveItemToTrash(this.pth);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     win.webContents.send('LOCAL_FILES_DELETE_COMPLETE', { pth: this.pth });

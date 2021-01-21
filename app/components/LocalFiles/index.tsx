@@ -53,8 +53,8 @@ const LocalFiles = (props: any) => {
         style={{ color: '#DDD', cursor: 'pointer' }}
       >
 
-        <span onClick={() => getListAsync(v.path, null)} className={`icon ${v.icon}`} style={{ color: v.clr }}/>
-        <span onClick={() => getListAsync(v.path, null)}>{v.name}</span>
+        <span onClick={() => getListAsync(v.path, null, v.bookmark)} className={`icon ${v.icon}`} style={{ color: v.clr }}/>
+        <span onClick={() => getListAsync(v.path, null, v.bookmark)}>{v.name}</span>
         <span onClick={() => removeLocalFavFolder(v.path)} className="icon icon-minus-circled favRemove" style={{cursor: 'pointer', position: 'absolute', left: '0px'}} />
       </div>
     );
@@ -211,6 +211,7 @@ const LocalFiles = (props: any) => {
           </nav>
         </div>
         <div className="pane">
+          {listFiles.length > 0 ?
           <table className="table-striped">
             <thead>
               <tr>
@@ -222,6 +223,11 @@ const LocalFiles = (props: any) => {
             </thead>
             <tbody>{listFiles}</tbody>
           </table>
+          :
+          <div className="noFolderDiv">
+            <button className="btn btn-large btn-primary" type="button"  onClick={()=>selectLocalFavFolder()}>Add a Folder</button>
+          </div>
+          }
         </div>
       </div>
     </div>

@@ -1,8 +1,10 @@
 import { LOCALFILES_ACTION } from '../actions/localfiles';
+import DataStore from '../utils/dataStore';
 
+const favourites:any = DataStore.Get('favourites', []);
 const initialState = {
   currentPath: null,
-  favourites: [],
+  favourites: favourites,
   pathHistory: [],
   fileList: [],
   seletedFileTT: 0,
@@ -10,7 +12,7 @@ const initialState = {
   uploadQueueCnt: 0,
   progressPercent: {},
   totalProgressPercent: 0,
-  favouritesCount: 0
+  favouritesCount: favourites.length
 };
 
 const localfiles = (state = initialState, action: any) => {

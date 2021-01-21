@@ -7,8 +7,6 @@ import {
   MenuItemConstructorOptions
 } from 'electron';
 
-const path = require('path');
-
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
   localFilesCnt: number;

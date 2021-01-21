@@ -69,7 +69,11 @@
   text-decoration: none;
   cursor: pointer;
 }
-
+.noFolderDiv{
+  width: 100%;
+  text-align: center;
+  padding-top: 20%;
+}
 .favRemove {
   display: none;
 }

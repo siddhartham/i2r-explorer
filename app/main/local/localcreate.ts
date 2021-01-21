@@ -25,7 +25,7 @@ export default class LocalCreate {
         win.webContents.send('LOCAL_FOLDER_CREATE_COMPLETE', { pth: dirpath });
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 }
